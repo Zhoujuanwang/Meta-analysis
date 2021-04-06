@@ -5,6 +5,11 @@ install.packages("metafor")
 install.packages("devtools")
 devtools::install_github("MathiasHarrer/dmetar")
 
+library(tidyverse)
+library(meta)
+library(metafor)
+library(dmetar)
+
 # Import data:
 madata <- read.csv("Meta_analysis_Data.csv")
 # 对文件的变量类型等进行修改，使其符合分析的要求
@@ -103,6 +108,70 @@ m.hksj.raw <- metacont(Ne,
                        prediction = TRUE,
                        sm = "SMD")
 m.hksj.raw
+
+# do meta analysis for Binary outcomes
+# import data:
+binarydata <- read.csv("binarydata.csv")
+
+# Meta analysis with raw binary data, using random-effect model and 
+# RR to be the summary measure
+m.bin <-  metabin(Ec,
+                  Ne,
+                  Ec,
+                  Nc,
+                  data = binarydata,
+                  studlab = paste(Author),
+                  comb.fixed = FALSE,
+                  comb.random = TRUE,
+                  method.tau = "SJ",
+                  hakn = TRUE,
+                  prediction = TRUE,
+                  incr = 0.1,
+                  sm = "RR")
+m.bin
+
+# L'AbbePlots
+labbe.metabin(x = m.bin,
+              bg = "red",
+              studlab = TRUE,
+              col.random = "blue")
+
+# incidence rates
+# load data
+load("C:/Users/17524/Desktop/study/R/Meta-analysis/IRR.data.RData")
+
+# metainc() in meta packages
+args(metainc)
+
+m.IRR <- metainc(event.e,
+                 time.e,
+                 event.c,
+                 event.c,
+                 studlab = paste(Author),
+                 data = IRR.data,
+                 sm = "IRR",
+                 method.tau = "DL",
+                 comb.random = TRUE,
+                 comb.fixed = FALSE,
+                 hakn = TRUE)
+m.IRR
+
+# Pre-caculated effect sizes
+# first, log-transform all the effect size data
+bin.metagen$RR <- log(bin.metagen$RR)
+bin.metagen$lower <- log(bin.metagen$lower)
+bin.metagen$upper <- log(bin.metagen$upper)
+# calculate the standard error seTE
+bin.metagen$seTE <- (bin.metagen$upper - bin.metagen$lower)/3.92
+# reconvert effect sizes to their original scale, specificy sm = "RR"
+metagen(RR,
+        seTE,
+        studlab = Author,
+        method.tau = "SJ",
+        sm = "RR",
+        data = bin.metagen)
+
+
 
 
 
