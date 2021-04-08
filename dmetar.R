@@ -171,7 +171,78 @@ metagen(RR,
         sm = "RR",
         data = bin.metagen)
 
+# When pooling correlations, it is advised to perform Fisher's z-
+# transformation to obtain accurate weights for each study.
+# function: metacont()
+str(metacor)
+# the data in metacor() should inclding study label, the correlation
+# r(cor) reported for each study , and the sample size(n) for each study
+load("cordata.R")
+m.cor <- metacor(cor,
+                 n,
+                 data = cordata,
+                 studlab = cordata$Author,
+                 sm = "ZCOR",
+                 method.tau = "SJ")
+m.cor
 
+# Generating a Forest Plot
+# forest() function
+str(forest)
+forest(m.hksj.raw)
+?meta::forest
 
+forest(m.hksj.raw,
+       sortvar = TE,
+       xlim = c(-1.5, 0.5),
+       rightlabs = c("g", "95% CI", "weight"),
+       leftlabs = c("Author", "N", "Mean", "SD", "N", "Mean", "SD"),
+       lab.e = "Intervention",
+       pooled.totals = FALSE,
+       smlab = "",
+       text.random = "Overall effect",
+       print.tau2 = FALSE,
+       col.diamond = "blue",
+       col.diamond.lines = "black",
+       col.predict = "black",
+       print.I2.ci = TRUE,
+       digits.sd = 2
+       )
 
+# two layout types of forest plot: "RevMan5" and "JAMA"
+# "RevMan5"
+forest(m.hksj.raw,
+       layout = "RevMan5",
+       digits.sd = 2)
+# "JAMA"
+# "RevMan5"
+forest(m.hksj.raw,
+       layout = "JAMA",
+       text.predict = "95% CI",
+       col.predict = "black",
+       colgap.forest.left = unit(15, "mm"))
 
+# Saving the forest plots
+pdf(file='forestplot with JAMA layout.pdf')
+forest.jama <- forest(m.hksj.raw,
+                      layout = "JAMA",
+                      text.predict = "95% CI",
+                      col.predict = "black",
+                      colgap.forest.left = unit(15, "mm"))
+dev.off()
+
+png(file='forestplot with JAMA layout.png')
+forest.jama <- forest(m.hksj.raw,
+                      layout = "JAMA",
+                      text.predict = "95% CI",
+                      col.predict = "black",
+                      colgap.forest.left = unit(15, "mm"))
+dev.off()
+
+svg(file='forestplot with JAMA layout.svg')
+forest.jama <- forest(m.hksj.raw,
+                      layout = "JAMA",
+                      text.predict = "95% CI",
+                      col.predict = "black",
+                      colgap.forest.left = unit(15, "mm"))
+dev.off()
