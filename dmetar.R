@@ -9,6 +9,7 @@ library(tidyverse)
 library(meta)
 library(metafor)
 library(dmetar)
+library(dplyr)
 
 # Import data:
 madata <- read.csv("Meta_analysis_Data.csv")
@@ -246,3 +247,48 @@ forest.jama <- forest(m.hksj.raw,
                       col.predict = "black",
                       colgap.forest.left = unit(15, "mm"))
 dev.off()
+
+# Hetergeneity Measures Q I^2 tau^2
+m.hksj
+
+# Detecting Outliers & Influential Cases
+m.hksj$lower.random
+m.hksj$upper.random
+
+spot.outliers.random <- function(metagen_output){
+        data <- metagen_output
+        Author <- data$studlab
+        lowerci <- data$lower
+        upperci <- data$upper
+        m.outliers <- data.frame(Author, lowerci, upperci)
+        te.lower <- data$lower.random
+        te.upper <- data$upper.random
+        dplyr::filter(m.outliers, upperci < te.lower)
+        dplyr::filter(m.outliers, lowerci > te.upper)
+}
+
+spot.outliers.random(metagen_output = m.hksj)
+
+m.hksj.outliers <- update.meta(m.hksj,
+                               subset = Author != c("DanitzOrsillo",
+                                                    "Shapiro et al."))
+m.hksj.outliers
+
+# for fixed-effect model:
+spot.outliers.fixed <- function(metagen_output){
+        data <- metagen_output
+        Author <- data$studlab
+        lowerci <- data$lower
+        upperci <- data$upper
+        m.outliers <- data.frame(Author, lowerci, upperci)
+        te.lower <- data$lower.fixed
+        te.upper <- data$upper.fixed
+        dplyr::filter(m.outliers, upperci < te.lower)
+        dplyr::filter(m.outliers, lowerci > te.upper)
+}
+
+# Influence Analyses
+
+InfluenceAnalysis(x = m.hksj,
+                  random = TRUE)
+
