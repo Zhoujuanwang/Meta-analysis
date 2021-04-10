@@ -290,5 +290,32 @@ spot.outliers.fixed <- function(metagen_output){
 # Influence Analyses
 
 InfluenceAnalysis(x = m.hksj,
-                  random = TRUE)
+                  random = TRUE,
+                  return.separate.plots = TRUE)
+
+# GOSH plot analysis
+
+# 将用meta包生成的数据转换为metafor可以识别的数据：
+m.rma <- rma(yi = m.hksj$TE,
+             sei = m.hksj$seTE,
+             method = m.hksj$method.tau,
+             test = "knha")
+# generate the GOAH plot:
+dat.gosh <- gosh(m.rma)
+plot(dat.gosh, alpha= 0.1, col = "blue")
+
+gosh.diagnostics(dat.gosh)
+
+metagen(TE,
+        seTE,
+        data = madata,
+        studlab = paste(Author),
+        comb.fixed = FALSE,
+        comb.random = TRUE,
+        method.tau = "SJ",
+        hakn = TRUE,
+        prediction = TRUE,
+        sm = "SMD",
+        exclude = c(3, 10, 16))
+
 
