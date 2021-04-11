@@ -318,4 +318,45 @@ metagen(TE,
         sm = "SMD",
         exclude = c(3, 10, 16))
 
+# subgroup analysis
+# using the Mixed-Effects-Model
+
+subgroup.analysis.mixed.effects(x = m.hksj,
+                                subgroups = madata$Control)
+# p值大于0.05， 说明亚组之间差距无统计学意义
+
+# using the random-effects model
+
+region.subgroup <- update.meta(m.hksj,
+                               byvar = region,
+                               comb.random = TRUE,
+                               comb.fixed = FALSE)
+region.subgroup
+
+# Meta regression
+
+metareg(m.hksj, Control)
+# continuous variables
+madata$pub_year<-c(2001,2002,2011,2013,2013,2014,1999,2018,2001,2002,
+                   2011,2013,2013,2014,1999,2018,2003,2005)
+madata$pub_year<-as.numeric(madata$pub_year)
+m.pubyear<-metagen(TE,
+                   seTE,
+                   studlab = paste(Author),
+                   comb.fixed = FALSE,
+                   data=madata)
+m.pubyear
+output.metareg <- metareg(m.pubyear, pub_year)
+output.metareg
+
+# plotting regressions: bubble() function in meta
+str(meta::bubble)
+bubble(output.metareg,
+       xlab = "Publication Year",
+       col.line = "blue",
+       studlab = TRUE)
+
+
+
+
 
