@@ -356,7 +356,45 @@ bubble(output.metareg,
        col.line = "blue",
        studlab = TRUE)
 
+# multiple meta regression:
+load("C:/Users/17524/Desktop/study/R/Meta-analysis/mvreg_data.rda")
+mvreg.data$continent <- factor(mvreg.data$continent)
 
+# first step: checking for multicollinearity:
+# 计算预测变量之间的线性关系：cor()函数
+cor(mvreg.data[,3:5])
 
+# 绘图
+library(PerformanceAnalytics)
+chart.Correlation(mvreg.data[,3:5])
 
+# fitting a meta-regression model without interaction terms:
+model2 <- rma(yi = yi,
+              sei = sei,
+              data = mvreg.data,
+              method = 'ML',
+              mods = ~ quality,
+              test = 'knha')
+model2
+# ?
+anova(model1, model2)
+
+# modeling interaction terms
+interaction.model <- rma(yi = yi,
+                         sei = sei,
+                         data = mvreg.data,
+                         method = 'REML',
+                         mods = ~ pubyear * continent,
+                         test = 'knha')
+interaction.model
+
+# permutation test:
+permutest(model2)
+
+# Multimodel inference
+multimodel.inference(TE = 'yi',
+                     seTE = 'sei',
+                     data = mvreg.data,
+                     predictors = c('pubyear', 'quality', 'reputation', 'continent'),
+                     interaction = FALSE)
 
