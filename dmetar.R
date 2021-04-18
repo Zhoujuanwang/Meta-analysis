@@ -397,4 +397,22 @@ multimodel.inference(TE = 'yi',
                      data = mvreg.data,
                      predictors = c('pubyear', 'quality', 'reputation', 'continent'),
                      interaction = FALSE)
+# publication bias
+
+# small-study effect methods
+funnel(m.hksj, xlab = "Hedges' g")
+
+funnel(m.hksj, xlab = "Hedges' g",
+       contour = c(.95, .975, .99),
+       col.contour = c('darkblue', 'blue', 'lightblue'))+
+legend(1.4, 0, c('p < 0.05', 'p < 0.025', 'p < 0.001'), bty = 'n',
+       fill = c('darkblue', 'blue', 'lightblue'))
+
+# Egger's test
+eggers.test(x = m.hksj)
+trimfill(m.hksj)
+
+m.hksj.trimfill <- trimfill(m.hksj)
+funnel(m.hksj.trimfill, xlab = "Hedges' g")
+
 
