@@ -415,4 +415,24 @@ trimfill(m.hksj)
 m.hksj.trimfill <- trimfill(m.hksj)
 funnel(m.hksj.trimfill, xlab = "Hedges' g")
 
+# Performing a p-curve analysis
+pcurve(m.hksj)
+
+# estimate the "true" effect
+# we should know the total sample size of each study, assuming that:
+N.m.hksj <- c(105, 161, 60, 37, 141, 82, 97, 61, 200, 79, 124, 25, 166, 59, 
+              201, 95, 166, 144)
+pcurve(m.hksj, effect.estimation = TRUE, N = N.m.hksj)
+
+# Risk of Bias Summary
+rob <- read.csv("rob.csv")
+rob.summary(rob, studies = rob$Author, table = TRUE)
+
+
+
+
+
+
+
+
 
